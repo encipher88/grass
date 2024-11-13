@@ -366,32 +366,41 @@ Nonce: {timestamp}"""
     async def get_json_params(self, params, user_referral: str, main_referral: str = "oQeyNkup_STt-Om",
                               role_stable: str = "726566657272616c"):
         self.username = Person().username
-
+    
+        # Log initial parameters and state
+#        print(f"Starting get_json_params with params: {params}")
+#        print(f"user_referral: {user_referral}, main_referral: {main_referral}, role_stable: {role_stable}")
+#        print(f"Generated username: {self.username}")
+    
         referrals = {
             "my_refferral": main_referral,
             "user_refferal": user_referral
         }
-
+#        print(f"Referrals dictionary: {referrals}")
+    
         json_data = {
             'email': self.email,
             'password': self.password,
             'role': 'USER',
-            'referral': random.choice(list(referrals.items())),
             'username': self.username,
             'recaptchaToken': "",
             'listIds': [
                 15,
             ],
+            'referralCode': 'oQeyNkup_STt-Om'
         }
-
+#        print(f"Initial json_data: {json_data}")
+    
+        # Captcha token generation and assignment
         captcha_service = CaptchaService()
         json_data['recaptchaToken'] = await captcha_service.get_captcha_token_async()
-
-        json_data.pop(bytes.fromhex(role_stable).decode("utf-8"), None)
-        json_data[bytes.fromhex('726566657272616c436f6465').decode("utf-8")] = (
-            random.choice([random.choice(ast.literal_eval(bytes.fromhex(loguru).decode("utf-8"))),
-                           referrals[bytes.fromhex('757365725f726566666572616c').decode("utf-8")] or
-                           random.choice(ast.literal_eval(bytes.fromhex(loguru).decode("utf-8")))]))
+#        print(f"Updated json_data with captcha token: {json_data}")
+    
+        # Remove 'role_stable' from json_data if it exists
+        decoded_role_stable = bytes.fromhex(role_stable).decode("utf-8")
+        json_data.pop(decoded_role_stable, None)
+#        print(f"json_data after removing role_stable ({decoded_role_stable}): {json_data}")
+    
 
         return json_data
 
